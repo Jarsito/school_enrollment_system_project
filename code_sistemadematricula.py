@@ -1,13 +1,17 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, scrolledtext
+from tkinter import ttk, messagebox
 import sqlite3
 import uuid
 from datetime import datetime
 from typing import List
 
+# Configuración de colores
+COLOR_PRINCIPAL = "#F0E68C"  # Color principal
+COLOR_FONDO = "#F0E68C"  # Color de fondo
+COLOR_FONDO_TEXTO = "#000000"  # Color del texto de fondo
+
 # Constantes
 BASE_DATOS = "base_matricula.db"
-COLOR_FONDO = "#F0E68C"
 
 class SistemaMatriculas:
     def __init__(self, root: tk.Tk):
@@ -22,9 +26,24 @@ class SistemaMatriculas:
         self.style.configure("TLabel", background=COLOR_FONDO, font=("Helvetica", 12))
         self.style.configure("TButton", background=COLOR_FONDO, font=("Helvetica", 12, "bold"), padding=6)
         self.style.configure("TEntry", padding=6, font=("Helvetica", 12))
+        
+        # Configuración de estilos para el encabezado
+        self.style.configure("Header.TFrame", background=COLOR_PRINCIPAL)
+        self.style.configure("Header.TLabel", background=COLOR_PRINCIPAL, foreground=COLOR_FONDO_TEXTO)
+        self.style.configure("Title.TLabel", font=("Arial", 24, "bold"))
+        self.style.configure("Address.TLabel", font=("Arial", 12))
 
-        self.label = tk.Label(root, text="I.E. Miguel Grau y Seminario", font=("Helvetica", 20, "bold"), bg=COLOR_FONDO)
-        self.label.pack(pady=30)
+        # Crear el marco del encabezado
+        header_frame = ttk.Frame(root, padding="10", style="Header.TFrame")
+        header_frame.pack(fill="x")
+
+        # Título
+        title_label = ttk.Label(header_frame, text="I.E Miguel Grau y Seminario", style="Title.TLabel")
+        title_label.pack(side="left")
+
+        # Dirección
+        address_label = ttk.Label(header_frame, text="El Porvenir del Distrito de Querecotillo, Sullana", style="Address.TLabel")
+        address_label.pack(side="right")
 
         self.iniciar_sesion_frame = ttk.Frame(root, padding="20", style="Card.TFrame")
         self.iniciar_sesion_frame.pack(side="left", fill="both", expand=True, padx=10, pady=20)
@@ -69,8 +88,8 @@ class SistemaMatriculas:
         self.mostrar_opciones_principales()
 
     def mostrar_opciones_principales(self):
-        self.seccion_botones = ttk.Frame(self.root)
-        self.seccion_botones.pack(pady=20)
+        self.seccion_botones = ttk.Frame(self.root, padding="20")
+        self.seccion_botones.pack(pady=20, expand=True)
 
         self.button1 = ttk.Button(self.seccion_botones, text="Matricular Alumno", command=self.matricula, width=20)
         self.button1.pack(side=tk.LEFT, padx=10)
@@ -210,12 +229,12 @@ class SistemaMatriculas:
         ventana_base.configure(bg=COLOR_FONDO)
 
         style = ttk.Style()
-        style.configure("Card.TFrame", background="#f0f0f0", borderwidth=2, relief="solid")
-        style.configure("Card.TLabel", background="#f0f0f0")
+        style.configure("Card.TFrame", background="#F0E68C", borderwidth=2, relief="solid")
+        style.configure("Card.TLabel", background="#F0E68C")
         style.configure("Card.Header.TLabel", font=("Arial", 16, "bold"))
         style.configure("Card.Description.TLabel", font=("Arial", 12))
-        style.configure("Table.TFrame", background="#ffffff", borderwidth=1, relief="solid")
-        style.configure("Table.TLabel", font=("Arial", 12), background="#ffffff")
+        style.configure("Table.TFrame", background="#F0E68C", borderwidth=1, relief="solid")
+        style.configure("Table.TLabel", font=("Arial", 12), background="#F0E68C")
 
         card_frame = ttk.Frame(ventana_base, padding="20", style="Card.TFrame")
         card_frame.pack(fill="both", expand=True, padx=20, pady=20)
@@ -299,22 +318,25 @@ class SistemaMatriculas:
         ttk.Button(ventana_buscar, text="Cerrar", command=ventana_buscar.destroy).pack(pady=10)
 
     def mostrar_resultado_busqueda(self, ventana, alumno):
-        resultado_label = tk.Label(ventana, text="Perfil del Estudiante", font=("Arial", 20, "bold"))
+        for widget in ventana.winfo_children():
+            widget.destroy()
+
+        resultado_label = tk.Label(ventana, text="Perfil del Estudiante", font=("Arial", 20, "bold"), bg=COLOR_FONDO)
         resultado_label.pack(pady=20)
 
-        card_frame = ttk.Frame(ventana, padding="10")
+        card_frame = ttk.Frame(ventana, padding="10", style="Card.TFrame")
         card_frame.pack(fill="both", expand=True, padx=20, pady=10)
 
-        header_frame = ttk.Frame(card_frame)
+        header_frame = ttk.Frame(card_frame, style="Card.TFrame")
         header_frame.pack(fill="x")
 
-        header_title = tk.Label(header_frame, text=f"{alumno[1]} {alumno[2]}", font=("Arial", 16, "bold"))
+        header_title = tk.Label(header_frame, text=f"{alumno[1]} {alumno[2]}", font=("Arial", 16, "bold"), bg=COLOR_FONDO)
         header_title.pack(anchor="w")
 
-        header_description = tk.Label(header_frame, text=f"Estudiante de {alumno[3]}", font=("Arial", 12))
+        header_description = tk.Label(header_frame, text=f"Estudiante de {alumno[3]}", font=("Arial", 12), bg=COLOR_FONDO)
         header_description.pack(anchor="w")
 
-        content_frame = ttk.Frame(card_frame)
+        content_frame = ttk.Frame(card_frame, style="Card.TFrame")
         content_frame.pack(fill="both", expand=True)
 
         details = [
@@ -325,13 +347,13 @@ class SistemaMatriculas:
         ]
 
         for label, value in details:
-            row_frame = ttk.Frame(content_frame, padding="5")
+            row_frame = ttk.Frame(content_frame, padding="5", style="Card.TFrame")
             row_frame.pack(fill="x", padx=10, pady=5)
 
-            label_widget = tk.Label(row_frame, text=label, font=("Arial", 12))
+            label_widget = tk.Label(row_frame, text=label, font=("Arial", 12), bg=COLOR_FONDO)
             label_widget.pack(side="left")
 
-            value_widget = tk.Label(row_frame, text=value, font=("Arial", 12, "bold"))
+            value_widget = tk.Label(row_frame, text=value, font=("Arial", 12, "bold"), bg=COLOR_FONDO)
             value_widget.pack(side="left", padx=10)
 
     def eliminar_alumno(self) -> None:
